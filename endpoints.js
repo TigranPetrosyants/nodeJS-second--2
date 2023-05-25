@@ -8,7 +8,6 @@ function validObjectId(id) {
 }
 
 function getBooks(req, res) {
-  const book = req.body;
   const db = getDB();
   const collection = db.collection(collectionName);
 
@@ -31,8 +30,8 @@ function getBook(req, res) {
       .find({ _id: new ObjectId(id) })
       .toArray()
       .then((result) => {
-        const book = result;
-        if (book.length > 0) {
+        if (result.length > 0) {
+          const book = result[0];
           return res.status(200).json(book);
         } else {
           return res.status(404).json({ error: "Book not found" });
