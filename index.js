@@ -33,4 +33,4 @@ app.get("/:id", getBook);
 
 app.put("/:id", updateBook);
 
-// app.delete("/:id", deleteBook);
+app.delete("/:id", deleteBook);
