@@ -4,7 +4,7 @@ const { getDB } = require("./db");
 const collectionName = "books";
 
 function validObjectId(id) {
-  return ObjectId.isValid(id) && (id.length === 24);
+  return ObjectId.isValid(id) && id.length === 24;
 }
 
 function getBooks(req, res) {
@@ -28,29 +28,65 @@ function getBook(req, res) {
     const collection = db.collection(collectionName);
 
     collection
-    .find(
-        { _id: new ObjectId(id) }
-    )
-    .toArray()
-    .then((result) => {
-      const book = result;
-      if (book.length > 0) {
-        return res.status(200).json(book);
-      }else {
-        return res.status(404).json({ error: 'Book not found' });
-      }
-    })
-    .catch((err) => {
-      console.error('Error getting book', err);
-      res.status(500).json({ error: 'Error getting book' });
-    });
+      .find({ _id: new ObjectId(id) })
+      .toArray()
+      .then((result) => {
+        const book = result;
+        if (book.length > 0) {
+          return res.status(200).json(book);
+        } else {
+          return res.status(404).json({ error: "Book not found" });
+        }
+      })
+      .catch((err) => {
+        console.error("Error getting book", err);
+        res.status(500).json({ error: "Error getting book" });
+      });
+  } else {
+    res.status(404).json({ error: "Object ID is not valid" });
+  }
+}
 
-  }else {
-    res.status(404).json({ error: 'Object ID is not valid' });
+function createBook(req, res) {
+  if (req.body.title && req.body.author) {
+    const { title, author } = req.body;
+    const newBook = {
+      date: new Date(),
+      title,
+      author,
+    };
+
+    const db = getDB();
+    const collection = db.collection(collectionName);
+
+    collection
+      .findOne({ title: newBook.title })
+      .then((existingBook) => {
+        if (existingBook) {
+          return res.status(409).json({ error: "Book already exists" });
+        }
+
+        collection
+          .insertOne(newBook)
+          .then((result) => {
+            return res.status(201).json(result);
+          })
+          .catch((err) => {
+            console.error(err);
+            return res.status(500).json({ Error: "Unable to add book" });
+          });
+      })
+      .catch((err) => {
+        console.error("Error checking duplicate book", err);
+        res.status(500).json({ error: "Error checking duplicate book" });
+      });
+  } else {
+    res.status(404).send("The Title or Author fields are empty.");
   }
 }
 
 module.exports = {
   getBooks,
   getBook,
+  createBook,
 };

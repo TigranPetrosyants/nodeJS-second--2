@@ -25,7 +25,7 @@ connectToDB()
     console.error("Failed to connect to MongoDB", err);
   });
 
-// app.post("/", createBook);
+app.post("/", createBook);
 
 app.get("/", getBooks);
 
