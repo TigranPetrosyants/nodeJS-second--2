@@ -31,6 +31,6 @@ app.get("/", getBooks);
 
 app.get("/:id", getBook);
 
-// app.put("/:id", updateBook);
+app.put("/:id", updateBook);
 
 // app.delete("/:id", deleteBook);
